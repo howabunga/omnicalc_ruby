@@ -4,20 +4,14 @@ class CalculationsController < ApplicationController
     @text = params[:user_text]
     @special_word = params[:user_word]
 
-    # ================================================================================
-    # Your code goes below.
-    # The text the user input is in the string @text.
-    # The special word the user input is in the string @special_word.
-    # ================================================================================
+    @character_count_with_spaces = @text.length
 
+    @character_count_without_spaces = @text.gsub(" ", "").length
 
-    @character_count_with_spaces = "Replace this string with your answer."
+    @word_count = @text.split.count
 
-    @character_count_without_spaces = "Replace this string with your answer."
+    @occurrences = @text.capitalize.split.count(@special_word)
 
-    @word_count = "Replace this string with your answer."
-
-    @occurrences = "Replace this string with your answer."
   end
 
   def loan_payment
@@ -25,65 +19,71 @@ class CalculationsController < ApplicationController
     @years = params[:number_of_years].to_i
     @principal = params[:principal_value].to_f
 
-    # ================================================================================
-    # Your code goes below.
-    # The annual percentage rate the user input is in the decimal @apr.
-    # The number of years the user input is in the integer @years.
-    # The principal value the user input is in the decimal @principal.
-    # ================================================================================
+    @monthly_payment = (@apr/100/12*@principal)/(1-(1+@apr/100/12)**(-(@years*12)))
 
-    @monthly_payment = "Replace this string with your answer."
   end
 
   def time_between
     @starting = Chronic.parse(params[:starting_time])
     @ending = Chronic.parse(params[:ending_time])
 
-    # ================================================================================
-    # Your code goes below.
-    # The start time is in the Time @starting.
-    # The end time is in the Time @ending.
-    # Note: Ruby stores Times in terms of seconds since Jan 1, 1970.
-    #   So if you subtract one time from another, you will get an integer
-    #   number of seconds as a result.
-    # ================================================================================
+    @seconds = (@ending-@starting).abs
+    @minutes = ((@ending-@starting)/60).abs
+    @hours = ((@ending-@starting)/60/60).abs
+    @days = ((@ending-@starting)/60/60/24).abs
+    @weeks = ((@ending-@starting)/60/60/24/7).abs
+    @years = ((@ending-@starting)/60/60/24/365.25).abs
 
-    @seconds = "Replace this string with your answer."
-    @minutes = "Replace this string with your answer."
-    @hours = "Replace this string with your answer."
-    @days = "Replace this string with your answer."
-    @weeks = "Replace this string with your answer."
-    @years = "Replace this string with your answer."
   end
 
   def descriptive_statistics
     @numbers = params[:list_of_numbers].gsub(',', '').split.map(&:to_f)
 
-    # ================================================================================
-    # Your code goes below.
-    # The numbers the user input are in the array @numbers.
-    # ================================================================================
+    @sorted_numbers = @numbers.sort
 
-    @sorted_numbers = "Replace this string with your answer."
+    @count = @numbers.count
 
-    @count = "Replace this string with your answer."
+    @minimum = @numbers.min
 
-    @minimum = "Replace this string with your answer."
+    @maximum = @numbers.max
 
-    @maximum = "Replace this string with your answer."
+    @range = @numbers.max-@numbers.min
 
-    @range = "Replace this string with your answer."
+    def median(list_of_numbers)
+      middle = list_of_numbers.size/2
+      sorting = list_of_numbers.sort
+      if sorting.length.odd?
+        return sorting[middle].to_f
+      else sorting.length.even?
+        return (((sorting[middle]) + (sorting[middle-1]))/2).to_f
+      end
+    end
 
-    @median = "Replace this string with your answer."
+    @median = median @numbers
 
-    @sum = "Replace this string with your answer."
+    def sum(list_of_numbers)
+      running_total = 0
+      list_of_numbers.each do |number|
+        running_total = running_total + number
+      end
+      return running_total
+    end
 
-    @mean = "Replace this string with your answer."
+    @sum = sum @numbers
 
-    @variance = "Replace this string with your answer."
+    @mean = @sum/@count
 
-    @standard_deviation = "Replace this string with your answer."
+    @variance = (@numbers.inject(0.0){|sum,x| sum +(x - @mean)**2})/@count
 
-    @mode = "Replace this string with your answer."
+    @standard_deviation = Math.sqrt(@variance)
+
+    def mode(list_of_numbers)
+      modecalc = list_of_numbers.inject({}){|a,b| a[b] = list_of_numbers.count(b); a}
+      display = modecalc.select{|a,b| b == modecalc.values.max}
+      return display.keys
+          end
+
+    @mode = mode @numbers
   end
+
 end
